@@ -33,7 +33,6 @@ contract RPS {
             throw;
         players[hash] = msg.sender;
         hashes[uint(state)] = hash;
-        incrementState();
     }
 
     // Convenience function; this.state can be queried directly
@@ -47,14 +46,14 @@ contract RPS {
     }
 
     // Important: Any attempt to call this method reveals the secret,
-    // even if it is not executed.
-    // assume: if a real player calls this, it is only when appropriate.
+    //            even if it is not executed for any reason.
+    // assume: if a real player calls this, mayReveal() returns true.
+    // The _test_ for this assumption is too late.
     function reveal(uint secret) validStates(State.REVEAL1, State.REVEAL2) {
         bytes32 hash = sha3(secret);
         if (players[hash] == 0 || choice[hash] != 0)
             throw;
         choice[hash] = int8(secret % 3) + 3;
-        incrementState();
     }
     
     function collect(bytes32 hash) validStates(State.COLLECT1, State.COLLECT2) {
@@ -65,7 +64,6 @@ contract RPS {
         // Reentrancy is fine
         if (!player.send(result))
             throw;
-        incrementState();
     }
     
     function gameResult(int8 choice1, int8 choice2) internal returns (uint) {
@@ -80,12 +78,12 @@ contract RPS {
         if (state != from && state != to)
             throw;
         _;
+        state = State(uint(state)+1);
+        if (state == State.DONE)
+            cleanup();
     }
 
-    function incrementState() internal {
-        state = State(uint(state)+1);
-        if (state != State.DONE)
-            return;
+    function cleanup() internal {
         delete choice[hashes[0]];
         delete choice[hashes[1]];
         delete hashes;
