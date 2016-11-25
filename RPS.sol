@@ -75,8 +75,8 @@ contract RPS is RPSI {
     }
     
     function collect(bytes32 token) validStates(State.COLLECT1, State.COLLECT2) {
-        bytes32 opponentHash = (token == tokens[0]) ? tokens[1] : tokens[0];
-        uint result = gameResult(choice[token], choice[opponentHash]);
+        bytes32 opponentToken = (token == tokens[0]) ? tokens[1] : tokens[0];
+        uint result = gameResult(choice[token], choice[opponentToken]);
         address player = players[token];
         delete players[token];
         // Reentrancy is fine
