@@ -33,8 +33,8 @@ library magic {
 }
 
 contract RPS is RPSI {
-    uint256 constant PENALTY = 0; // = 10 ether;
-    uint256 constant COST = 0; // = 100 ether;
+    uint256 constant PENALTY = 10 ether;
+    uint256 constant COST = 100 ether;
 
     enum State { JOIN1, JOIN2,
                  REVEAL1, REVEAL2,
