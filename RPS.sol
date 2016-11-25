@@ -49,6 +49,8 @@ contract RPS is RPSI {
     function deposit(bytes32 token) payable validStates(State.JOIN1, State.JOIN2) {
         if (msg.value != COST + PENALTY)
             throw;
+        if (players[token] != address(0x0))
+            throw;
         players[token] = msg.sender;
         tokens[uint(state)] = token;
     }
