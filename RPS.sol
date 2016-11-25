@@ -2,11 +2,11 @@ pragma solidity ^0.4.0;
 
 contract RPSI {
     /* Incentive-based Rock-Scissors-Paper game:
-    0. OFFLINE: 
+    0. OFFLINE:
     0.1: Choose a secret number, whose value modulo-3 define whether it is a rock, a paper or scissors.
     0.2: Get magic.token(secret).
     
-    1-2. deposit(token): Player-by-player commit to the token, 
+    1-2. deposit(token): Player-by-player commit to the token,
     3: Players query state until it is equal to REVEAL1 or REVEAL2.
          ONLY THEN should they put the secret anywhere accessible to miners or anyone.
          DO NOT automate it using a contract in any way, unless you KNOW it will only execute on the client.
@@ -89,7 +89,7 @@ contract RPS is RPSI {
         //                      this player  | other player
         if (diff == 0) return COST + PENALTY + 0       + 0      ;
         if (diff == 1) return COST + PENALTY + COST    + 0      ;
-        if (diff == 2) return 0       + 0    + 0       + PENALTY;
+        if (diff == 2) return 0    + 0       + 0       + PENALTY;
         throw;
     }
 
