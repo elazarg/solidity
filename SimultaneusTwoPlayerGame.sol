@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
 
-contract SimultaneusTwoPlayerGameI {
-    /* Incentive-based simultaneus two player game:
+contract SimultaneousTwoPlayerGameI {
+    /* Incentive-based simultaneous two player game:
     0. OFFLINE: 
     0.1: Choose a secret number.
     0.2: Get magic.token(secret).
@@ -32,7 +32,7 @@ library magic {
     }
 }
 
-contract SimultaneusTwoPlayerGame is SimultaneusTwoPlayerGameI {
+contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
     
     function judge(uint secret1, uint secret2) internal returns (uint index);
     
@@ -116,7 +116,7 @@ contract SimultaneusTwoPlayerGame is SimultaneusTwoPlayerGameI {
     }
 }
 
-contract RockPaperScissors is SimultaneusTwoPlayerGame {
+contract RockPaperScissors is SimultaneousTwoPlayerGame {
     function judge(uint secret1, uint secret2) internal returns (uint index) {
         uint8 diff = uint8((secret1 % 3 - secret2 % 3) % 3);
         if (diff == 0) return 0;
@@ -132,7 +132,7 @@ contract RockPaperScissors is SimultaneusTwoPlayerGame {
     }
 }
 
-contract OddsAndEvens is SimultaneusTwoPlayerGame {
+contract OddsAndEvens is SimultaneousTwoPlayerGame {
     function judge(uint secret1, uint secret2) internal returns (uint index) {
         uint diff = (secret1 % 2 + secret2 % 2);
         return (diff % 2 == 0) ? 1 : 2;
