@@ -52,10 +52,8 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
     mapping(bytes32 => uint) revealedSecret;
 
     function deposit(bytes32 token) payable validStates(State.JOIN1, State.JOIN2) {
-        if (msg.value != COST + PENALTY)
-            throw;
-        if (players[token] != 0)
-            throw;
+        require(msg.value == COST + PENALTY);
+        require(players[token] == 0);
         players[token] = msg.sender;
         commitments[uint(state)] = token;
     }
@@ -76,8 +74,8 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
     // The _test_ for this assumption is too late.
     function reveal(uint secret) validStates(State.REVEAL1, State.REVEAL2) {
         bytes32 c = magic.commitment(secret);
-        if (players[c] == 0 || revealedSecret[c] != 0)
-            throw;
+        require(players[c] != 0);
+        require(revealedSecret[c] == 0);
         revealedSecret[c] = secret;
     }
     
@@ -88,13 +86,11 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
         address player = players[token];
         delete players[token];
         // Reentrancy is fine
-        if (!player.send(payment()[index]))
-            throw;
+        player.transfer(payment()[index]));
     }
 
     modifier validStates(State from, State to) {
-        if (state != from && state != to)
-            throw;
+        require(state == from || state == to);
         _;
         state = State(uint(state)+1);
         if (state == State.DONE) {
