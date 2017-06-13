@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.11;
 
 contract SimultaneousTwoPlayerGameI {
     /* Incentive-based simultaneous two player game:
@@ -51,6 +51,9 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
     mapping(bytes32 => address) players;
     mapping(bytes32 => uint) revealedSecret;
 
+    event CommitDone();
+    event RevealDone();
+
     function deposit(bytes32 token) payable validStates(State.JOIN1, State.JOIN2) {
         require(msg.value == COST + PENALTY);
         require(players[token] == 0);
@@ -86,12 +89,16 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
         address player = players[token];
         delete players[token];
         // Reentrancy is fine
-        player.transfer(payment()[index]));
+        player.transfer(p[index]);
     }
 
     modifier validStates(State from, State to) {
         require(state == from || state == to);
         _;
+        if (state == State.JOIN2)
+            CommitDone();
+        if (state == State.REVEAL2)
+            RevealDone();
         state = State(uint(state)+1);
         if (state == State.DONE) {
             cleanup();
