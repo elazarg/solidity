@@ -11,7 +11,7 @@ contract SimultaneousTwoPlayerGameI {
          ONLY THEN should they put the secret anywhere accessible to miners or anyone.
          DO NOT automate it using a contract in any way, unless you KNOW it will only execute on the client.
     4-5. reveal(secret): Player-by-player they reveal their secret
-    6-7. collect(token): Player-by-player they collect their share
+    6-7. withdraw(token): Player-by-player they withdraw their share
     
     The losing side might not reveal his secret, thus locking the winner's money,
     but then he would lose the PENALTY forever along with COST. (Same goes for giving a fake hash.)
@@ -22,7 +22,7 @@ contract SimultaneousTwoPlayerGameI {
     function deposit(bytes32 hash) payable;
     function mayReveal() constant returns(bool);
     function reveal(uint secret);
-    function collect(bytes32 hash);
+    function withdraw(bytes32 hash);
 }
 
 library magic {
@@ -79,7 +79,7 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
         revealedSecret[c] = secret;
     }
     
-    function collect(bytes32 token) validStates(State.COLLECT1, State.COLLECT2) {
+    function withdraw(bytes32 token) validStates(State.COLLECT1, State.COLLECT2) {
         bytes32 opponentToken = (token == commitments[0]) ? commitments[1] : commitments[0];
         uint index = judge(revealedSecret[token], revealedSecret[opponentToken]);
         uint[3] memory p = payment();
