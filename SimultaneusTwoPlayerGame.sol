@@ -19,16 +19,16 @@ contract SimultaneousTwoPlayerGameI {
         http://www.ethereum-alarm-clock.com/
     */
 
-    function deposit(bytes32 hash) payable;
-    function mayReveal() constant returns(bool);
-    function reveal(uint secret);
-    function withdraw(bytes32 hash);
+    function deposit(bytes32 hash) public payable;
+    function mayReveal() public constant returns(bool);
+    function reveal(uint secret) public;
+    function withdraw(bytes32 hash) public;
 }
 
 library magic {
     // Helper function. Should only run LOCALLY by clients.
-    function commitment(uint v) constant returns(bytes32) {
-        return sha3(v);
+    function commitment(uint v) public constant returns(bytes32) {
+        return keccak256(v);
     }
 }
 
@@ -54,7 +54,7 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
     event CommitDone();
     event RevealDone();
 
-    function deposit(bytes32 token) payable validStates(State.JOIN1, State.JOIN2) {
+    function deposit(bytes32 token) payable validStates(State.JOIN1, State.JOIN2) public {
         require(msg.value == COST + PENALTY);
         require(players[token] == 0);
         players[token] = msg.sender;
@@ -63,26 +63,26 @@ contract SimultaneousTwoPlayerGame is SimultaneousTwoPlayerGameI {
 
     // Convenience function; this.state can be queried directly
     // You may only use reveal() if this function returns true
-    function mayReveal() constant returns(bool) {
+    function mayReveal() constant public returns(bool)  {
         if (state == State.REVEAL1 || state == State.REVEAL2)
             return true;
         if (state == State.JOIN2)
             return false;
-        throw;
+        require(false);
     }
 
     // Important: Any attempt to call this method reveals the secret,
     //            even if it is not executed for any reason.
     // assume: if a real player calls this, mayReveal() returns true.
     // The _test_ for this assumption is too late.
-    function reveal(uint secret) validStates(State.REVEAL1, State.REVEAL2) {
+    function reveal(uint secret) public validStates(State.REVEAL1, State.REVEAL2) {
         bytes32 c = magic.commitment(secret);
         require(players[c] != 0);
         require(revealedSecret[c] == 0);
         revealedSecret[c] = secret;
     }
     
-    function withdraw(bytes32 token) validStates(State.COLLECT1, State.COLLECT2) {
+    function withdraw(bytes32 token) public validStates(State.COLLECT1, State.COLLECT2) {
         bytes32 opponentToken = (token == commitments[0]) ? commitments[1] : commitments[0];
         uint index = judge(revealedSecret[token], revealedSecret[opponentToken]);
         uint[3] memory p = payment();
@@ -125,7 +125,7 @@ contract RockPaperScissors is SimultaneousTwoPlayerGame {
         if (diff == 0) return 0;
         if (diff == 1) return 1;
         if (diff == 2) return 2;
-        throw;
+        require(false);
     }
     
     function payment() constant internal returns (uint[3]) {
