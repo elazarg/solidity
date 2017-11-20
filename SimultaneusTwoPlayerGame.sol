@@ -27,7 +27,7 @@ contract SimultaneousTwoPlayerGameI {
 
 library magic {
     // Helper function. Should only run LOCALLY by clients.
-    function commitment(uint v) public constant returns(bytes32) {
+    function commitment(uint v) pure public returns(bytes32) {
         return keccak256(v);
     }
 }
